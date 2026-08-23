@@ -1,0 +1,10 @@
+﻿venv/
+__pycache__/
+*.pyc
+.env
+*.enc.json
+*.log
+instance/
+.aurem/
+ngrok
+ngrok.exe

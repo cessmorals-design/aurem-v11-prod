@@ -3,7 +3,7 @@ from flask import Flask, request, render_template_string, send_from_directory, j
 from dotenv import load_dotenv
 load_dotenv()
 app=Flask(__name__)
-DOMAIN=os.getenv("NGROK_DOMAIN","saturday-cheer-manpower.ngrok-free.dev")
+DOMAIN=os.getenv(" # ngrok disabled on Render _DOMAIN","saturday-cheer-manpower. # ngrok disabled on Render -free.dev")
 os.makedirs("out/ads",exist_ok=True); os.makedirs("logs",exist_ok=True); os.makedirs("clients",exist_ok=True)
 conn=sqlite3.connect("logs/v11.db", check_same_thread=False)
 conn.execute("CREATE TABLE IF NOT EXISTS users(phone TEXT PRIMARY KEY,email TEXT,ref TEXT,status TEXT,token TEXT,created TEXT,next_bill TEXT,paid INT,refs INT,cv TEXT)")
@@ -69,8 +69,8 @@ def tg():
 def watchdog():
     while True:
         try:
-            from pyngrok import ngrok
-            if not ngrok.get_tunnels(): ngrok.connect(8080, domain=DOMAIN)
+            from  # ngrok disabled on Render  import  # ngrok disabled on Render 
+            if not  # ngrok disabled on Render .get_tunnels():  # ngrok disabled on Render .connect(8080, domain=DOMAIN)
         except: pass
         time.sleep(300)
 HTML="""
@@ -126,10 +126,11 @@ if __name__=="__main__":
     threading.Thread(target=autopost, daemon=True).start()
     threading.Thread(target=watchdog, daemon=True).start()
     try:
-        from pyngrok import ngrok
-        t=open(".env").read().split("NGROK_AUTHTOKEN=")[1].splitlines()[0].strip() if pathlib.Path(".env").exists() else ""
-        if t and "PASTE" not in t: ngrok.set_auth_token(t)
-        ngrok.kill(); pub=ngrok.connect(8080, domain=DOMAIN); print(f"V11 MAX LIVE {pub.public_url} EMPIRE")
-    except Exception as e: print(f"NGROK {e}")
+        from  # ngrok disabled on Render  import  # ngrok disabled on Render 
+        t=open(".env").read().split(" # ngrok disabled on Render _AUTHTOKEN=")[1].splitlines()[0].strip() if pathlib.Path(".env").exists() else ""
+        if t and "PASTE" not in t:  # ngrok disabled on Render .set_auth_token(t)
+         # ngrok disabled on Render .kill(); pub= # ngrok disabled on Render .connect(8080, domain=DOMAIN); print(f"V11 MAX LIVE {pub.public_url} EMPIRE")
+    except Exception as e: print(f" # ngrok disabled on Render  {e}")
     app.run(host="0.0.0.0", port=8080)
+
 
