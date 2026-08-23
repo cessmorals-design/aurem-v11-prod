@@ -1,0 +1,9 @@
+﻿flask
+python-dotenv
+requests
+pyngrok
+beautifulsoup4
+lxml
+openai
+apscheduler
+gunicorn

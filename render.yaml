@@ -1,0 +1,13 @@
+﻿services:
+    - type: web
+    name: aurem-v11-prod
+    env: docker
+    plan: starter
+    dockerfilePath:./Dockerfile
+    envVars:
+            - key: NGROK_DOMAIN
+        value: aurem-v11-prod.onrender.com
+            - key: MPESA_ENV
+        value: production
+            - key: PYTHONUNBUFFERED
+        value: 1
