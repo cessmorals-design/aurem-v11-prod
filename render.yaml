@@ -1,13 +1,9 @@
 ﻿services:
     - type: web
     name: aurem-v11-prod
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
     envVars:
-            - key: DOMAIN
-        value: aurem-v11-prod.onrender.com
-            - key: FB_PROFILE_ID
-        value: 61591547206054
-            - key: REF_CODE
-        value: 0716706708
+            - key: PORT
+        value: 10000
