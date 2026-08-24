@@ -1,121 +1,64 @@
-﻿import os, requests, base64, json, time
-from datetime import datetime
-from flask import Flask, request, jsonify, render_template_string
+﻿import os, pathlib, sqlite3, datetime, threading, time, random, requests, logging
+from flask import Flask, request, jsonify, render_template_string, send_from_directory
 from dotenv import load_dotenv
 load_dotenv()
-
 app = Flask(__name__)
-
-# ENV
-MPESA_ENV = os.getenv("MPESA_ENV","production")
-CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
-CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
-SHORTCODE = os.getenv("MPESA_SHORTCODE")
-PASSKEY = os.getenv("MPESA_PASSKEY")
-B2C_INITIATOR = os.getenv("MPESA_B2C_INITIATOR")
-B2C_PASSWORD = os.getenv("MPESA_B2C_PASSWORD")
-B2C_SHORTCODE = os.getenv("MPESA_B2C_SHORTCODE", SHORTCODE)
-
-BASE_URL = "https://api.safaricom.co.ke" if MPESA_ENV=="production" else "https://sandbox.safaricom.co.ke"
-
-def get_token():
-    if not CONSUMER_KEY: return None
-    auth = base64.b64encode(f"{CONSUMER_KEY}:{CONSUMER_SECRET}".encode()).decode()
-    r = requests.get(f"{BASE_URL}/oauth/v1/generate?grant_type=client_credentials", headers={"Authorization": f"Basic {auth}"}, timeout=15)
-    return r.json().get("access_token")
-
-@app.route('/')
+logging.basicConfig(level=logging.INFO)
+DOMAIN = os.getenv("NGROK_DOMAIN", "aurem-v11-prod.onrender.com")
+BASE_URL = f"https://{DOMAIN}"
+for d in ["out/ads","logs","clients","out/proof","out/cvs"]: pathlib.Path(d).mkdir(parents=True, exist_ok=True)
+def get_db():
+    conn = sqlite3.connect("logs/v11_autopost.db", check_same_thread=False)
+    conn.execute("CREATE TABLE IF NOT EXISTS users(phone TEXT PRIMARY KEY, email TEXT, ref TEXT, ref_l2 TEXT, ref_l3 TEXT, status TEXT, token TEXT, created TEXT, next_bill TEXT, paid INT, refs INT, posts INT, county TEXT)")
+    conn.execute("CREATE TABLE IF NOT EXISTS posts(id INTEGER PRIMARY KEY AUTOINCREMENT, file TEXT, platform TEXT, caption TEXT, status TEXT, response TEXT, created TEXT)")
+    conn.execute("CREATE TABLE IF NOT EXISTS jobs(id INTEGER PRIMARY KEY AUTOINCREMENT, phone TEXT, county TEXT, title TEXT, portal TEXT, status TEXT, created TEXT)")
+    conn.execute("CREATE TABLE IF NOT EXISTS cv_sales(id INTEGER PRIMARY KEY AUTOINCREMENT, phone TEXT, amount INT, code TEXT, status TEXT, created TEXT)")
+    conn.commit()
+    return conn
+db = get_db()
+def v12_provision(phone, ref="0716706708", county="Nairobi"):
+    token=f"V12_{phone}_{random.randint(100000,999999)}"
+    p=pathlib.Path(f"clients/{phone}"); p.mkdir(exist_ok=True)
+    (p/"engine.py").write_text(f"# V12 {token} ref:{ref}", encoding="utf-8")
+    cur=db.execute("SELECT ref FROM users WHERE phone=?", (ref,)).fetchone()
+    ref_l2=cur[0] if cur else "0716706708"
+    cur2=db.execute("SELECT ref FROM users WHERE phone=?", (ref_l2,)).fetchone() if ref_l2 else None
+    ref_l3=cur2[0] if cur2 else "0716706708"
+    db.execute("INSERT OR REPLACE INTO users(phone, ref, ref_l2, ref_l3, status, token, created, paid, refs, posts, county) VALUES (?,?,?,?,?,?,?,?,?,?,?)", (phone, ref, ref_l2, ref_l3, "ACTIVE", token, datetime.datetime.now().isoformat(), 7777, 0, 0, county))
+    db.commit()
+    try: db.execute("UPDATE users SET refs=refs+1 WHERE phone=?", (ref,)); db.commit()
+    except: pass
+    return token, ref, ref_l2, ref_l3
+@app.route("/")
 def home():
-    return render_template_string("""
-    <style>body{font-family:sans-serif;text-align:center;padding:40px} .btn{padding:12px 24px;background:#00d632;color:white;border-radius:8px;text-decoration:none}</style>
-    <h1>AUREM V11  PRODUCTION LIVE </h1>
-    <p>Render Singapore | {{env}} | {{time}}</p>
-    <p><a class=btn href='/dash'>Open Dashboard</a></p>
-    <p><a href='/health'>/health</a>  <a href='/b2c_test/0716706708'>Test B2C 1k</a></p>
-    """, env=MPESA_ENV, time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-
-@app.route('/health')
+    cnt=db.execute("SELECT COUNT(*) FROM users WHERE status='ACTIVE'").fetchone()[0]
+    rev=db.execute("SELECT SUM(paid) FROM users").fetchone()[0] or 0
+    ref=request.args.get("ref","0716706708")
+    return render_template_string(f"<h1>AUREM V12 LIVE</h1><p>ACTIVE:{cnt} REV:{rev} Ref:{ref}</p><form action=/pay method=post><input name=phone placeholder=07... required><input name=ref value={ref} type=hidden><button>PAY 7777 V12</button></form><p><a href=/dash>/dash</a> | <a href=/health>/health</a></p>")
+@app.route("/pay", methods=["POST"])
+def pay():
+    phone=request.form.get("phone","").strip().replace(" ","").replace("+","")
+    if phone.startswith("0"): phone="254"+phone[1:]
+    ref=request.form.get("ref","0716706708")
+    token,r1,r2,r3=v12_provision(phone,ref)
+    return jsonify({"status":"DEPLOYED","token":token})
+@app.route("/health")
 def health():
-    return jsonify(status="ok", env=MPESA_ENV, shortcode=SHORTCODE, has_token=bool(CONSUMER_KEY), timestamp=datetime.now().isoformat())
-
-@app.route('/dash')
+    return jsonify({"v12":"LIVE","has_token": bool(os.getenv("MPESA_SHORTCODE") or os.getenv("FB_PAGE_TOKEN") or os.getenv("WA_TOKEN")),"wa": bool(os.getenv("WA_TOKEN")),"cv_count": len(list(pathlib.Path("out/cvs").glob("*.pdf"))),"domain":DOMAIN,"timestamp": datetime.datetime.now().isoformat()})
+@app.route("/dash")
 def dash():
-    return render_template_string("""
-    <h1>V11 DASH  PROD</h1>
-    <ul>
-    <li>Env: {{env}}</li>
-    <li>Shortcode: {{sc}}</li>
-    <li>B2C Initiator: {{init}}</li>
-    <li>Base: {{base}}</li>
-    </ul>
-    <p>Endpoints: /stk_push, /b2c_test/&lt;phone&gt;, /webhook, /mpesa/callback</p>
-    """, env=MPESA_ENV, sc=SHORTCODE, init=B2C_INITIATOR, base=BASE_URL)
-
-@app.route('/stk_push', methods=['POST'])
-def stk_push():
-    data = request.json or {}
-    phone = data.get('phone','0716706708')
-    amount = data.get('amount',1)
-    token = get_token()
-    if not token: return jsonify(error="no token, check CONSUMER_KEY"),500
-    ts = datetime.now().strftime("%Y%m%d%H%M%S")
-    pwd = base64.b64encode(f"{SHORTCODE}{PASSKEY}{ts}".encode()).decode()
-    payload = {
-        "BusinessShortCode": SHORTCODE,
-        "Password": pwd,
-        "Timestamp": ts,
-        "TransactionType": "CustomerPayBillOnline",
-        "Amount": amount,
-        "PartyA": phone,
-        "PartyB": SHORTCODE,
-        "PhoneNumber": phone,
-        "CallBackURL": f"https://aurem-v11-prod.onrender.com/mpesa/callback",
-        "AccountReference": "AUREM",
-        "TransactionDesc": "AUREM Test"
-    }
-    r = requests.post(f"{BASE_URL}/mpesa/stkpush/v1/processrequest", json=payload, headers={"Authorization": f"Bearer {token}"}, timeout=15)
-    return jsonify(r.json())
-
-@app.route('/b2c_test/<phone>')
-def b2c_test(phone):
-    token = get_token()
-    if not token: return jsonify(error="No token, set MPESA env vars on Render", env=MPESA_ENV)
-    # NOTE: For prod B2C you need SecurityCredential (cert). This will return error until cert added  that's expected.
-    payload = {
-        "InitiatorName": B2C_INITIATOR,
-        "SecurityCredential": B2C_PASSWORD or "PLACEHOLDER_NEEDS_CERT",
-        "CommandID": "BusinessPayment",
-        "Amount": 10,
-        "PartyA": B2C_SHORTCODE,
-        "PartyB": phone,
-        "Remarks": "AUREM Test 10",
-        "QueueTimeOutURL": "https://aurem-v11-prod.onrender.com/mpesa/b2c_timeout",
-        "ResultURL": "https://aurem-v11-prod.onrender.com/mpesa/b2c_result",
-        "Occasion": "Test"
-    }
-    r = requests.post(f"{BASE_URL}/mpesa/b2c/v3/paymentrequest", json=payload, headers={"Authorization": f"Bearer {token}"}, timeout=15)
-    return jsonify(request=r.json(), note="If 'Invalid SecurityCredential' -> need cert generation next")
-
-@app.route('/mpesa/callback', methods=['POST'])
-def mpesa_cb():
-    print("MPESA CALLBACK", request.json)
-    return jsonify(ResultCode=0, ResultDesc="ok")
-
-@app.route('/mpesa/b2c_result', methods=['POST'])
-def b2c_result():
-    print("B2C RESULT", request.json)
-    return jsonify(ResultCode=0, ResultDesc="ok")
-
-@app.route('/mpesa/b2c_timeout', methods=['POST'])
-def b2c_timeout():
-    print("B2C TIMEOUT", request.json)
-    return jsonify(ResultCode=0, ResultDesc="ok")
-
-@app.route('/webhook', methods=['GET','POST'])
+    users=db.execute("SELECT phone, paid FROM users ORDER BY created DESC LIMIT 50").fetchall()
+    return "<h1>V12 DASH LIVE</h1>" + "<br>".join([f"{u[0]} {u[1]}" for u in users])
+@app.route("/callback", methods=["POST"])
+@app.route("/mpesa_cv_callback", methods=["POST"])
+@app.route("/webhook", methods=["GET","POST"])
 def webhook():
-    if request.method=='GET':
-        return request.args.get('hub.challenge','ok')
-    return jsonify(status="webhook received")
-
-if __name__=='__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv("PORT",10000)))
+    if request.method=="GET" and request.path=="/webhook":
+        if request.args.get("hub.verify_token")==os.getenv("WA_VERIFY","aurem_v12_verify"): return request.args.get("hub.challenge"),200
+        return "fail",403
+    return jsonify({"ResultCode":0,"ResultDesc":"V12 OK"})
+@app.route("/out/ads/<path:fn>")
+def serve_ad(fn): return send_from_directory("out/ads", fn)
+@app.route("/out/cvs/<path:fn>")
+def serve_cv(fn): return send_from_directory("out/cvs", fn)
+if __name__=="__main__": app.run(host="0.0.0.0", port=int(os.getenv("PORT",10000)))
