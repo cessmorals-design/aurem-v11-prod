@@ -1,13 +1,13 @@
 ﻿services:
     - type: web
     name: aurem-v11-prod
-    env: docker
-    plan: starter
-    dockerfilePath:./Dockerfile
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
     envVars:
-            - key: NGROK_DOMAIN
+            - key: DOMAIN
         value: aurem-v11-prod.onrender.com
-            - key: MPESA_ENV
-        value: production
-            - key: PYTHONUNBUFFERED
-        value: 1
+            - key: FB_PROFILE_ID
+        value: 61591547206054
+            - key: REF_CODE
+        value: 0716706708

@@ -1,0 +1,10 @@
+﻿<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>AUREM Jobs KE - Iko Kazi</title>
+<style>body{font-family:sans-serif;background:#fff;color:#111;padding:12px} .job{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0} .btn{background:#000;color:#fff;padding:10px 14px;border-radius:8px;display:inline-block;text-decoration:none}</style></head>
+<body>
+<h1> IKO KAZI - {{jobs|length}} Batches</h1>
+<p>Domain: {{domain}} | Ref: {{ref}} | Channel: <a href="https://whatsapp.com/channel/0029VbD5CSQ6LwHlCzEAt01s">WhatsApp 1.8K</a></p>
+{% for j in jobs %}
+<div class="job"><h3>{{j.title}} - {{j.org}}</h3><p>Deadline: {{j.deadline}} | {{j.count if j.count else ""}} vacancies</p><a class="btn" href="{{j.link}}?ref={{ref}}">Apply Now</a> <a class="btn" style="background:#25D366" href="https://whatsapp.com/channel/0029VbD5CSQ6LwHlCzEAt01s">Join Channel</a></div>
+{% endfor %}
+<p><a class="btn" href="https://www.facebook.com/profile.php?id=61591547206054">Morals Voke FB</a></p>
+</body></html>

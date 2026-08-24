@@ -1,0 +1,12 @@
+﻿import json, pathlib
+jobs=[
+{"id":"kakamega_586","title":"County Government Kakamega 586 Vacancies","org":"Kakamega County","deadline":"2026-08-27","link":"https://opportunitiesforyoungkenyans.co.ke/2026/08/22/586-vacancies-open-at-county-government-of-kakamega/","count":586},
+{"id":"helb_17","title":"HELB 17 Vacancies","org":"HELB","deadline":"2026-09-01","link":"https://www.helb.co.ke/careers/","count":17},
+{"id":"city_eye","title":"Procurement Officer City Eye Hospital","org":"City Eye Hospital","deadline":"2026-08-28","link":"https://cityeyehospital.or.ke/careers","count":1},
+{"id":"one_mara","title":"One Mara Carbon Internship Maasai Mara 6 Months","org":"One Mara Carbon","deadline":"2026-08-26","link":"https://onemara.com/careers","count":5},
+{"id":"banking","title":"Absa Britam One Acre Fund 26 Jobs","org":"Banking","deadline":"2026-08-30","link":"https://ke.absa.africa/careers","count":26},
+{"id":"teaching","title":"Teaching Jobs Kikuyu Karen Athi River - Accommodation Provided","org":"Private Schools","deadline":"2026-09-15","link":"https://aurem-v11-prod.onrender.com","count":12},
+{"id":"private","title":"Salespersons Riders BAs Pharmtech Urgent","org":"Private","deadline":"ASAP","link":"https://aurem-v11-prod.onrender.com","count":20}
+]
+pathlib.Path("out/jobs_today.json").write_text(json.dumps(jobs,indent=2),encoding="utf-8")
+print(f"Built {len(jobs)}")
