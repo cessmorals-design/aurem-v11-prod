@@ -1,0 +1,66 @@
+
+ MAMA V21 - 4.3MB -> 430MB ROADMAP - 7 DAYS TO 430MB
+
+CURRENT: 80MB (18x growth from 4.3MB)
+TARGET: 430MB
+REMAINING: 350MB = ~5000 PDFs / videos / ads
+
+DAY 1-7 PLAN - 50MB per day:
+
+DAY 1 (Today) - 80MB -> 130MB (+50MB):
+- Post EVERYTHING.html?ref=MAMA 3x in channel (9am, 1pm, 7pm)
+- Post in 5 FB groups: Nairobi Jobs, Medical Jobs Kenya, CV Writing
+- Goal: 50 users x 150 = 7500 KES
+- Create 20 new CV variants (nurse ICU, nurse theatre, lab tech, etc)
+- Each CV = 0.5MB x 20 = 10MB
+
+DAY 2 - 130MB -> 180MB:
+- Use /whatsapp/send to deliver to DAY1 50 users + ask for referrals
+- Each user brings 2 refs = 100 new users = 100 x 500 = 50k earned by team
+- Create video testimonials (10 videos x 5MB = 50MB)
+
+DAY 3 - 180MB -> 230MB:
+- Launch TikTok: 3 videos/day using out/video/script.txt
+- Add 30 more templates (different colors) = 15MB
+- Add voice notes: out/voice/ (Mama voice selling) = 35MB
+
+DAY 4-7 - 230MB -> 430MB:
+- Repeat + hire 2 more agents (now 7 -> 9 members)
+- Each agent brings 20/day = 180/day = 1260/week
+- 1260 x 150 = 189,000 KES/week
+- Files: out/ads/ (100 ads x 0.3MB = 30MB) + out/growth/ (testimonials 100MB) + out/cvs/ (200 templates 100MB)
+
+FORMULA FOR 430MB:
+- out/cvs/ : 200 PDFs x 0.5MB = 100MB
+- out/ads/ : 300 JPGs x 0.3MB = 90MB
+- out/video/ : 50 videos x 3MB = 150MB
+- out/voice/ : 100 MP3 x 0.5MB = 50MB
+- out/growth/ : 40MB
+TOTAL = 430MB
+
+YOUR LINKS - NEVER LOSE THEM:
+1. MAMA EARNING LINK: https://aurem-v11-prod.onrender.com/out/EVERYTHING.html?ref=254716706708
+2. YOUR LINK: https://aurem-v11-prod.onrender.com/out/EVERYTHING.html?ref=0716706708
+3. ADMIN: https://aurem-v11-prod.onrender.com/admin
+4. PAY: https://aurem-v11-prod.onrender.com/mpesa/pay?ref=254716706708
+5. DELIVERY: https://aurem-v11-prod.onrender.com/delivery/success?ref=254716706708
+6. REF STATS: https://aurem-v11-prod.onrender.com/ref-stats
+7. HEALTH: https://aurem-v11-prod.onrender.com/health
+8. MPESA TX: https://aurem-v11-prod.onrender.com/mpesa/tx
+9. WA CONFIG: https://aurem-v11-prod.onrender.com/whatsapp/config
+
+TEAM 7 LINKS (from out/refs/MAMA_7_REF_LINKS.txt):
+- Each has EVERYTHING + PAY + DELIVERY + QR
+
+DAILY POST TEMPLATE (copy-paste 3x daily):
+ NAIROBI 997 JOBS - MAMA V12 CVs @150 - 2 MINS DELIVERY 
+ 3 ATS CVs (Nurse, Clinical, Support) + Guide
+ MAMA delivers in 2 mins after 150
+ Earn 500 per ref - share your link
+
+ https://aurem-v11-prod.onrender.com/out/EVERYTHING.html?ref=254716706708
+
+Pay: https://aurem-v11-prod.onrender.com/mpesa/pay?ref=254716706708
+#NairobiJobs #MedicalJobs #CV
+
+AUTO-POSTER: python out/ultimate/AUTO_POSTER.py
