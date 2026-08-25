@@ -1,4 +1,4 @@
-﻿# V21 STABLE PROD - NO DB CRASH - aurem-v11-prod
+﻿# V21 STABLE PROD - NO DB - NO init_db - 25/08 FINAL
 from flask import Flask, jsonify, request, send_from_directory, redirect
 import os, json
 from datetime import datetime
@@ -25,23 +25,20 @@ def save_data(d):
 
 @app.route('/health')
 def health():
-    d = load_data()
-    return jsonify({"v12":"LIVE","v21":"LIVE - ADMIN+EVERYTHING+OUT+90%+2547 - FIXED 25/08","domain":"aurem-v11-prod.onrender.com","cv_count":4,"build":"V21 FIXED INIT_DB"})
+    return jsonify({"v12":"LIVE","v21":"LIVE FIXED 25/08 - NO CODE 3","domain":"aurem-v11-prod.onrender.com","build":"V21 FINAL GREEN","time":datetime.utcnow().isoformat()})
 
 @app.route('/admin/data')
 def admin_data():
-    d = load_data()
-    users = d.get("users", {})
-    tx = d.get("tx", [])
-    rev = sum([t.get("amount",0) for t in tx])
-    return jsonify({"totalUsers":len(users),"totalRev":rev,"totalClicks":len(d.get("clicks",[])),"totalConv":len(d.get("conversions",[])),"leaderboard":[],"tx":tx[-20:]})
+    d=load_data()
+    tx=d.get("tx",[])
+    return jsonify({"totalUsers":len(d.get("users",{})),"totalRev":sum([t.get("amount",0) for t in tx]),"totalClicks":len(d.get("clicks",[])),"totalConv":len(d.get("conversions",[])),"tx":tx[-20:]})
 
 @app.route('/track/click')
 def track_click():
-    d = load_data()
-    ref = request.args.get("ref","direct")
+    d=load_data()
+    ref=request.args.get("ref","direct")
     if ref not in d["users"]:
-        d["users"][ref] = {"clicks":0,"rev":0,"conv":0}
+        d["users"][ref]={"clicks":0,"rev":0,"conv":0}
     d["users"][ref]["clicks"]+=1
     d["clicks"].append({"ref":ref,"time":datetime.utcnow().isoformat()})
     save_data(d)
@@ -49,13 +46,12 @@ def track_click():
 
 @app.route('/track/conv')
 def track_conv():
-    d = load_data()
-    ref = request.args.get("ref","direct")
-    amount = float(request.args.get("amount","0"))
+    d=load_data()
+    ref=request.args.get("ref","direct")
+    amount=float(request.args.get("amount","0"))
     if ref not in d["users"]:
-        d["users"][ref] = {"clicks":0,"rev":0,"conv":0}
+        d["users"][ref]={"clicks":0,"rev":0,"conv":0}
     d["users"][ref]["rev"]+=amount
-    d["users"][ref]["conv"]+=1
     d["tx"].append({"ref":ref,"amount":amount,"time":datetime.utcnow().isoformat()})
     save_data(d)
     return jsonify({"ok":True})
@@ -71,9 +67,3 @@ def serve_out(filename):
 @app.route('/admin/')
 def admin():
     return send_from_directory(str(OUT_DIR / "admin"), "index.html")
-
-@app.route('/wa/webhook', methods=['GET','POST'])
-def wa_webhook():
-    if request.method=='GET':
-        return request.args.get("hub.challenge","ok")
-    return jsonify({"status":"received"})
