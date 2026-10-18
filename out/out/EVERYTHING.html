@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VORAN7 EVERYTHING</title>
+<style>
+body{font-family:system-ui;background:#0a0a0a;color:#fff;padding:20px}
+.card{background:#1a1a1a;padding:24px;border-radius:16px;max-width:600px;margin:0 auto;text-align:center}
+.btn{background:#00ff88;color:#000;padding:16px 32px;border-radius:12px;text-decoration:none;display:block;font-weight:800;font-size:18px;margin:20px 0}
+h1{color:#00ff88}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>VORAN7 V21 FINAL GREEN</h1>
+<p>Domain: aurem-v11-prod.onrender.com</p>
+<p>Ref: <span id="ref">loading</span></p>
+<p>90% Ready - EVERYTHING Bundle</p>
+<a id="buyBtn" class="btn" href="#">BUY NOW - KES 2500</a>
+<p id="status"></p>
+<script>
+const urlParams=new URLSearchParams(window.location.search);
+const ref=urlParams.get('ref')||'254716706708';
+document.getElementById('ref').innerText=ref;
+document.getElementById('buyBtn').href='/buy?ref='+ref;
+fetch('/track/click?ref='+ref).then(()=>{
+    document.getElementById('status').innerText='Tracked: '+ref;
+});
+</script>
+</div>
+</body>
+</html>
