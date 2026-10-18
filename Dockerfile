@@ -5,7 +5,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY v11_max.py .
+COPY out/ ./out/
 
 RUN mkdir -p out/admin
 
