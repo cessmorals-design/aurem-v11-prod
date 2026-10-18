@@ -1,8 +1,10 @@
-﻿FROM python:3.11-slim
+FROM python:3.11-slim
+
 WORKDIR /app
-COPY requirements.txt.
+
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY..
-RUN mkdir -p out/admin
-EXPOSE 10000
-CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT:-10000} --workers 1 --timeout 120"]
+
+COPY . .
+
+CMD ["python", "v11_max.py"]
