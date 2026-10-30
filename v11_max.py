@@ -45,14 +45,14 @@ def health():
 
 @app.route('/admin/data')
 def admin_data():
+    expected = os.environ.get("AUREM_ADMIN_TOKEN", "").strip()
+    supplied = request.headers.get("Authorization", "")
+    if not expected or not supplied.startswith("Bearer "):
+        return jsonify({"ok": False, "error": "admin_auth_required"}), 401
+    if not hmac.compare_digest(supplied[7:].strip(), expected):
+        return jsonify({"ok": False, "error": "admin_auth_invalid"}), 401
     try:
         d = load_data()
-        expected = os.environ.get("AUREM_ADMIN_TOKEN", "").strip()
-        supplied = request.headers.get("Authorization", "")
-        if not expected or not supplied.startswith("Bearer "):
-            return jsonify({"ok": False, "error": "admin_auth_required"}), 401
-        if not hmac.compare_digest(supplied[7:].strip(), expected):
-            return jsonify({"ok": False, "error": "admin_auth_invalid"}), 401
         users = d.get("users", {})
         return jsonify({
             "totalUsers": len(users),
@@ -66,12 +66,14 @@ def admin_data():
         })
     except Exception as e:
         return jsonify({
-            "totalUsers": 0,
-            "totalRev": 0,
-            "totalClicks": 0,
-            "totalConv": 0,
+            "totalUsers": None,
+            "totalRev": None,
+            "revenueStatus": "unavailable",
+            "totalClicks": None,
+            "totalConv": None,
+            "unverifiedConversionSignals": None,
             "tx": [],
-            "error": str(e)
+            "error": "admin_data_unavailable"
         })
 
 @app.route('/track/click')
