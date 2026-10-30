@@ -8,3 +8,9 @@ instance/
 .aurem/
 ngrok
 ngrok.exe
+*.db
+*.sqlite
+*.sqlite3
+logs/
+data_v21.json
+.pytest_cache/
